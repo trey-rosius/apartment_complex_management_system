@@ -1,0 +1,60 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Mutation {
+  createUserAccount(input: UserInput!): User! @aws_cognito_user_pools
+  updateUserAccount(input: UpdateUserInput!): User! @aws_cognito_user_pools
+  deleteUserAccount(id: ID!): Boolean! @aws_cognito_user_pools
+}
+
+type Query {
+  getUserAccount(id: ID!): User! @aws_cognito_user_pools
+
+  getAllUserAccounts(pagination: Pagination): UsersResult!
+    @aws_cognito_user_pools(cognito_groups: ["Admins", "Caretakers"])
+}
+
+type User @aws_cognito_user_pools {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  verified: Boolean!
+  userType: UserType!
+
+  createdOn: AWSDateTime!
+}
+
+input UserInput {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  verified: Boolean!
+  userType: UserType!
+}
+
+input UpdateUserInput {
+  firstName: String!
+  lastName: String!
+  verified: Boolean!
+  userType: UserType!
+}
+
+enum UserType {
+  ADMIN
+  TENANT
+  CARETAKER
+}
+
+type UsersResult @aws_cognito_user_pools {
+  items: [User!]!
+  nextToken: String
+}
+
+input Pagination {
+  limit: Int
+  nextToken: String
+}
