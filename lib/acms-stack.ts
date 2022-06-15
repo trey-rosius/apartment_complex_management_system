@@ -13,9 +13,11 @@ import {
   Table,
 } from "aws-cdk-lib/aws-dynamodb";
 import { readFileSync } from "fs";
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class AcmsStack extends Stack {
+  public readonly acmsDatabase: Table;
+  public readonly acmsGraphqlApi: CfnGraphQLApi;
+  public readonly apiSchema: CfnGraphQLSchema;
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -69,55 +71,47 @@ export class AcmsStack extends Stack {
     /**
      * GraphQL API
      */
-    const acmsGraphqlApi: CfnGraphQLApi = new CfnGraphQLApi(
-      this,
-      "acmsGraphqlApi",
-      {
-        name: "ACMS",
-        authenticationType: "API_KEY",
+    this.acmsGraphqlApi = new CfnGraphQLApi(this, "acmsGraphqlApi", {
+      name: "ACMS",
+      authenticationType: "API_KEY",
 
-        additionalAuthenticationProviders: [
-          {
-            authenticationType: "AMAZON_COGNITO_USER_POOLS",
+      additionalAuthenticationProviders: [
+        {
+          authenticationType: "AMAZON_COGNITO_USER_POOLS",
 
-            userPoolConfig: {
-              userPoolId: userPool.userPoolId,
-              awsRegion: "us-east-2",
-            },
+          userPoolConfig: {
+            userPoolId: userPool.userPoolId,
+            awsRegion: "us-east-2",
           },
-        ],
-        userPoolConfig: {
-          userPoolId: userPool.userPoolId,
-          defaultAction: "ALLOW",
-          awsRegion: "us-east-2",
         },
+      ],
+      userPoolConfig: {
+        userPoolId: userPool.userPoolId,
+        defaultAction: "ALLOW",
+        awsRegion: "us-east-2",
+      },
 
-        logConfig: {
-          fieldLogLevel: "ALL",
-          cloudWatchLogsRoleArn: cloudWatchRole.roleArn,
-        },
-        xrayEnabled: true,
-      }
-    );
+      logConfig: {
+        fieldLogLevel: "ALL",
+        cloudWatchLogsRoleArn: cloudWatchRole.roleArn,
+      },
+      xrayEnabled: true,
+    });
 
     /**
      * Graphql Schema
      */
 
-    const apiSchema: CfnGraphQLSchema = new CfnGraphQLSchema(
-      this,
-      "ACMSGraphqlApiSchema",
-      {
-        apiId: acmsGraphqlApi.attrApiId,
-        definition: readFileSync("./schema/schema.graphql").toString(),
-      }
-    );
+    this.apiSchema = new CfnGraphQLSchema(this, "ACMSGraphqlApiSchema", {
+      apiId: this.acmsGraphqlApi.attrApiId,
+      definition: readFileSync("./schema/schema.graphql").toString(),
+    });
 
     /**
      * Database
      */
 
-    const acmsDatabase = new Table(this, "ACMSDynamoDbTable", {
+    this.acmsDatabase = new Table(this, "ACMSDynamoDbTable", {
       tableName: "AcmsDynamoDBTable",
 
       partitionKey: {
@@ -135,7 +129,7 @@ export class AcmsStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
-    acmsDatabase.addGlobalSecondaryIndex({
+    this.acmsDatabase.addGlobalSecondaryIndex({
       indexName: "bookingsPerApartment",
       partitionKey: {
         name: "GSI1PK",
@@ -161,11 +155,11 @@ export class AcmsStack extends Stack {
     });
 
     new CfnOutput(this, "GraphQLAPI ID", {
-      value: acmsGraphqlApi.attrApiId,
+      value: this.acmsGraphqlApi.attrApiId,
     });
 
     new CfnOutput(this, "GraphQLAPI URL", {
-      value: acmsGraphqlApi.attrGraphQlUrl,
+      value: this.acmsGraphqlApi.attrGraphQlUrl,
     });
   }
 }

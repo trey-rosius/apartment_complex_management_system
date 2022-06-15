@@ -23,6 +23,8 @@
     "@aws-lambda-powertools/logger": "^0.9.1",
     "@aws-lambda-powertools/tracer": "^0.9.1",
     "aws-cdk-lib": "2.27.0",
+    "aws-sdk": "^2.1153.0",
+    "ksuid": "^2.0.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.16"
   }

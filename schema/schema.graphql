@@ -23,12 +23,12 @@ type User @aws_cognito_user_pools {
   email: String!
   verified: Boolean!
   userType: UserType!
+  updatedOn: AWSDateTime
 
   createdOn: AWSDateTime!
 }
 
 input UserInput {
-  id: ID!
   firstName: String!
   lastName: String!
   email: String!
