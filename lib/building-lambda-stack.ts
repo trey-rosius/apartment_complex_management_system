@@ -14,13 +14,14 @@ import * as path from "path";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Tracing } from "aws-cdk-lib/aws-lambda";
 
-interface UserLambdaStackProps extends StackProps {
+interface BuildingLambdaStackProps extends StackProps {
   acmsGraphqlApi: CfnGraphQLApi;
   apiSchema: CfnGraphQLSchema;
   acmsDatabase: Table;
 }
-export class UserLamdaStacks extends Stack {
-  constructor(scope: Construct, id: string, props: UserLambdaStackProps) {
+
+export class BuildingLamdaStacks extends Stack {
+  constructor(scope: Construct, id: string, props: BuildingLambdaStackProps) {
     super(scope, id, props);
 
     const { acmsDatabase, acmsGraphqlApi, apiSchema } = props;
@@ -35,16 +36,17 @@ export class UserLamdaStacks extends Stack {
         signingProfiles: [signingProfile],
       }
     );
-    const acmsLambda = new NodejsFunction(this, "AcmsUserHandler", {
+
+    const buildingLambda = new NodejsFunction(this, "AcmsBuildingHandler", {
       tracing: Tracing.ACTIVE,
       codeSigningConfig,
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "handler",
-      entry: path.join(__dirname, "lambda-fns/user", "main.ts"),
+      entry: path.join(__dirname, "lambda-fns/building", "app.ts"),
 
       memorySize: 1024,
     });
-    acmsLambda.role?.addManagedPolicy(
+    buildingLambda.role?.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName(
         "service-role/AWSAppSyncPushToCloudWatchLogs"
       )
@@ -58,14 +60,14 @@ export class UserLamdaStacks extends Stack {
     );
     const lambdaDataSources: CfnDataSource = new CfnDataSource(
       this,
-      "ACMSLambdaDatasource",
+      "ACMSBuildingLambdaDatasource",
       {
         apiId: acmsGraphqlApi.attrApiId,
-        name: "ACMSLambdaDatasource",
+        name: "ACMSBuildingLambdaDatasource",
         type: "AWS_LAMBDA",
 
         lambdaConfig: {
-          lambdaFunctionArn: acmsLambda.functionArn,
+          lambdaFunctionArn: buildingLambda.functionArn,
         },
         serviceRoleArn: appsyncLambdaRole.roleArn,
       }
@@ -73,16 +75,16 @@ export class UserLamdaStacks extends Stack {
 
     const createUserAccountResolver: CfnResolver = new CfnResolver(
       this,
-      "createUserAccountResolver",
+      "createBuildingResolver",
       {
         apiId: acmsGraphqlApi.attrApiId,
         typeName: "Mutation",
-        fieldName: "createUserAccount",
+        fieldName: "createBuilding",
         dataSourceName: lambdaDataSources.attrName,
       }
     );
     createUserAccountResolver.addDependsOn(apiSchema);
-    acmsDatabase.grantFullAccess(acmsLambda);
-    acmsLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
+    acmsDatabase.grantFullAccess(buildingLambda);
+    buildingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
   }
 }

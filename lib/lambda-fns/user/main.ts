@@ -23,15 +23,8 @@ exports.handler = async (
   );
   switch (event.info.fieldName) {
     case "createUserAccount":
-      return await createUserAccount(event.arguments.input);
-    case "createNote":
-    // return await createNote(event.arguments.note);
-    case "listNotes":
-    //  return await listNotes();
-    case "deleteNote":
-    //  return await deleteNote(event.arguments.noteId);
-    case "updateNote":
-    //  return await updateNote(event.arguments.note);
+      return await createUserAccount(event.arguments.input, logger);
+
     default:
       return null;
   }

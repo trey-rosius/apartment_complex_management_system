@@ -1,10 +1,8 @@
-import { DynamoDB } from "aws-sdk";
-import { uuid } from "../utils";
 import { Logger } from "@aws-lambda-powertools/logger";
+import { DynamoDB } from "aws-sdk";
+import { uuid } from "../../utils";
 
-const logger = new Logger();
-
-async function createUserAccount(input: UserInput) {
+async function createUserAccount(input: UserInput, logger: Logger) {
   const documentClient = new DynamoDB.DocumentClient();
   let tableName = process.env.ACMS_DB;
   const createdOn = Date.now().toString();
@@ -22,18 +20,20 @@ async function createUserAccount(input: UserInput) {
     createdOn,
   };
 
-  logger.info("create user info", userInput);
+  logger.info("create user input info", userInput);
   const params = {
     TableName: tableName,
     Item: userInput,
+    ConditionExpression: "attribute_not_exists(PK)",
   };
 
   try {
     await documentClient.put(params).promise();
-    return input;
-  } catch (err) {
-    logger.error(`an error occured while creating user ${err}`);
-    return null;
+    return userInput;
+  } catch (error: any) {
+    if (error.name === "ConditionalCheckFailedException")
+      logger.error(`an error occured while creating user ${error}`);
+    throw Error("A user with same email address already Exist");
   }
 }
 export default createUserAccount;

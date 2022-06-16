@@ -3,6 +3,7 @@ import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
 import { AcmsStack } from "../lib/acms-stack";
 import { UserLamdaStacks } from "../lib/user-lambda-stack";
+import { BuildingLamdaStacks } from "../lib/building-lambda-stack";
 
 const app = new cdk.App();
 const acmsStack = new AcmsStack(app, "AcmsStack", {
@@ -22,6 +23,13 @@ const acmsStack = new AcmsStack(app, "AcmsStack", {
 });
 
 new UserLamdaStacks(app, "UserLambdaStacks", {
+  env: { account: "132260253285", region: "us-east-2" },
+  acmsDatabase: acmsStack.acmsDatabase,
+  apiSchema: acmsStack.apiSchema,
+  acmsGraphqlApi: acmsStack.acmsGraphqlApi,
+});
+
+new BuildingLamdaStacks(app, "BuildingLambdaStacks", {
   env: { account: "132260253285", region: "us-east-2" },
   acmsDatabase: acmsStack.acmsDatabase,
   apiSchema: acmsStack.apiSchema,
