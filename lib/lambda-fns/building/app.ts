@@ -9,7 +9,19 @@ type AppSyncEvent = {
   };
   arguments: {
     userId: string;
-    input: {};
+    building: BuildingInput;
+  };
+};
+
+type BuildingInput = {
+  name: string;
+  userId: string;
+  numberOfApartments: number;
+  address: {
+    streetAddress: string;
+    postalCode: string;
+    city: string;
+    country: string;
   };
 };
 
@@ -20,7 +32,7 @@ exports.handler = async (event: AppSyncEvent, context: any) => {
   );
   switch (event.info.fieldName) {
     case "createBuilding":
-      return await createBuilding(logger);
+      return await createBuilding(event.arguments.building, logger);
 
     default:
       return null;

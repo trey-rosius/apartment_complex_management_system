@@ -1,6 +1,4 @@
-import { uuid } from "../../utils";
-
-interface Parameter {
+interface UserParameters {
   id: string;
   firstName: string;
   lastName: string;
@@ -29,7 +27,7 @@ class UserEntity {
     userType,
     createdOn,
     updatedOn,
-  }: Parameter) {
+  }: UserParameters) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;

@@ -21,12 +21,12 @@ type Query {
 
 input BuildingInput {
   name: String!
+  userId: String!
   numberOfApartments: Int!
   address: AddressInput!
-  createdOn: AWSDate!
 }
 
-type Address {
+type Address @aws_cognito_user_pools {
   streetAddress: String!
   postalCode: String!
   city: String!
@@ -66,10 +66,11 @@ input UpdateUserInput {
 
 type Building @aws_cognito_user_pools {
   id: ID!
-  user: User!
+  userId: String!
+  name: String!
   address: Address!
   numberOfApartments: Int!
-  apartments: [Apartment]
+  apartments: [Apartment!]
   updateOn: AWSDateTime!
   createdOn: AWSDateTime!
 }
