@@ -13,10 +13,15 @@ type AppSyncEvent = {
   };
 };
 
-exports.handler = async (
-  event: AppSyncEvent,
-  context: any
-): Promise<UserInput | null> => {
+type UserInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  verified: boolean;
+  userType: string;
+};
+
+exports.handler = async (event: AppSyncEvent, context: any) => {
   logger.addContext(context);
   logger.info(
     `appsync event arguments ${event.arguments} and event info ${event.info}`

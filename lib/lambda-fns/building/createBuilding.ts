@@ -2,7 +2,7 @@ import { Logger } from "@aws-lambda-powertools/logger";
 import { DynamoDB } from "aws-sdk";
 import { uuid } from "../../utils";
 
-async function createBuilding(building: UserInput, logger: Logger) {
+async function createBuilding(logger: Logger) {
   console.log("in here");
   return null;
 }

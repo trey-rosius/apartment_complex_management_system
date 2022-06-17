@@ -9,21 +9,18 @@ type AppSyncEvent = {
   };
   arguments: {
     userId: string;
-    input: UserInput;
+    input: {};
   };
 };
 
-exports.handler = async (
-  event: AppSyncEvent,
-  context: any
-): Promise<UserInput | null> => {
+exports.handler = async (event: AppSyncEvent, context: any) => {
   logger.addContext(context);
   logger.info(
     `appsync event arguments ${event.arguments} and event info ${event.info}`
   );
   switch (event.info.fieldName) {
     case "createBuilding":
-      return await createBuilding(event.arguments.input, logger);
+      return await createBuilding(logger);
 
     default:
       return null;
