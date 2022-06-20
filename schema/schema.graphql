@@ -8,7 +8,10 @@ type Mutation {
   updateUserAccount(input: UpdateUserInput!): User! @aws_cognito_user_pools
   deleteUserAccount(id: ID!): Boolean! @aws_cognito_user_pools
 
-  createBuilding(building: BuildingInput!): Building!
+  createBuilding(input: BuildingInput!): Building!
+    @aws_cognito_user_pools(cognito_groups: ["Admins"])
+
+  createApartment(input: ApartmentInput): Apartment!
     @aws_cognito_user_pools(cognito_groups: ["Admins"])
 }
 
@@ -84,6 +87,14 @@ type Apartment @aws_cognito_user_pools {
   apartmentType: ApartmentType!
   kitchen: Boolean!
   numberOfRooms: Int!
+  createdOn: AWSDateTime!
+}
+
+input ApartmentInput @aws_cognito_user_pools {
+  apartmentNumber: String!
+  buildingId: String!
+  numberOfRooms: Int!
+  apartmentType: ApartmentType!
 }
 type UsersResult @aws_cognito_user_pools {
   items: [User!]!

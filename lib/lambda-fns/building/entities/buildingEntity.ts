@@ -49,6 +49,7 @@ export class BuildingEntity {
   toItem() {
     return {
       ...this.key(),
+      id: this.id,
       ENTITY: "BUILDING",
       name: this.name,
       userId: this.userId,

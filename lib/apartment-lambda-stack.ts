@@ -14,14 +14,14 @@ import * as path from "path";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Tracing } from "aws-cdk-lib/aws-lambda";
 
-interface BuildingLambdaStackProps extends StackProps {
+interface ApartmentLambdaStackProps extends StackProps {
   acmsGraphqlApi: CfnGraphQLApi;
   apiSchema: CfnGraphQLSchema;
   acmsDatabase: Table;
 }
 
-export class BuildingLamdaStacks extends Stack {
-  constructor(scope: Construct, id: string, props: BuildingLambdaStackProps) {
+export class ApartmentLamdaStacks extends Stack {
+  constructor(scope: Construct, id: string, props: ApartmentLambdaStackProps) {
     super(scope, id, props);
 
     const { acmsDatabase, acmsGraphqlApi, apiSchema } = props;
@@ -37,16 +37,16 @@ export class BuildingLamdaStacks extends Stack {
       }
     );
 
-    const buildingLambda = new NodejsFunction(this, "AcmsBuildingHandler", {
+    const apartmentLambda = new NodejsFunction(this, "AcmsApartmentHandler", {
       tracing: Tracing.ACTIVE,
       codeSigningConfig,
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: "handler",
-      entry: path.join(__dirname, "lambda-fns/building", "app.ts"),
+      entry: path.join(__dirname, "lambda-fns/apartment", "app.ts"),
 
       memorySize: 1024,
     });
-    buildingLambda.role?.addManagedPolicy(
+    apartmentLambda.role?.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName(
         "service-role/AWSAppSyncPushToCloudWatchLogs"
       )
@@ -60,31 +60,31 @@ export class BuildingLamdaStacks extends Stack {
     );
     const lambdaDataSources: CfnDataSource = new CfnDataSource(
       this,
-      "ACMSBuildingLambdaDatasource",
+      "ACMSApartmentLambdaDatasource",
       {
         apiId: acmsGraphqlApi.attrApiId,
-        name: "ACMSBuildingLambdaDatasource",
+        name: "ACMSApartmentLambdaDatasource",
         type: "AWS_LAMBDA",
 
         lambdaConfig: {
-          lambdaFunctionArn: buildingLambda.functionArn,
+          lambdaFunctionArn: apartmentLambda.functionArn,
         },
         serviceRoleArn: appsyncLambdaRole.roleArn,
       }
     );
 
-    const createBuildingResolver: CfnResolver = new CfnResolver(
+    const createApartmentResolver: CfnResolver = new CfnResolver(
       this,
-      "createBuildingResolver",
+      "createApartmentResolver",
       {
         apiId: acmsGraphqlApi.attrApiId,
         typeName: "Mutation",
-        fieldName: "createBuilding",
+        fieldName: "createApartment",
         dataSourceName: lambdaDataSources.attrName,
       }
     );
-    createBuildingResolver.addDependsOn(apiSchema);
-    acmsDatabase.grantFullAccess(buildingLambda);
-    buildingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
+    createApartmentResolver.addDependsOn(apiSchema);
+    acmsDatabase.grantFullAccess(apartmentLambda);
+    apartmentLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
   }
 }
