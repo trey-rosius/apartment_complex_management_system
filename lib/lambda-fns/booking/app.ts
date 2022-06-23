@@ -1,4 +1,7 @@
 import { Logger } from "@aws-lambda-powertools/logger";
+import createApartmentBooking from "./createApartmentBooking";
+
+import CreateBookingInput from "./CreateBookingInput";
 
 const logger = new Logger({ serviceName: "ApartmentComplexManagementApp" });
 
@@ -10,14 +13,6 @@ type AppSyncEvent = {
     userId: string;
     input: CreateBookingInput;
   };
-};
-
-type CreateBookingInput = {
-  userId: string;
-  apartmentId: string;
-  startDate: string;
-  endDate: string;
-  bookingStatus: string;
 };
 
 exports.handler = async (event: AppSyncEvent, context: any) => {
