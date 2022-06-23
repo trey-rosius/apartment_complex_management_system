@@ -13,6 +13,9 @@ type Mutation {
 
   createApartment(input: ApartmentInput): Apartment!
     @aws_cognito_user_pools(cognito_groups: ["Admins"])
+
+  createApartmentBooking(input: CreateBookingInput!): Booking!
+    @aws_cognito_user_pools(cognito_groups: ["Tenants"])
 }
 
 type Query {
@@ -20,6 +23,15 @@ type Query {
 
   getAllUserAccounts(pagination: Pagination): UsersResult!
     @aws_cognito_user_pools(cognito_groups: ["Admins", "Caretakers"])
+}
+
+input CreateBookingInput {
+  userId: String!
+  apartmentId: String!
+  startDate: AWSDate!
+  endDate: AWSDate!
+  BookingStatus: BookingStatus!
+  createdOn: AWSDateTime!
 }
 
 input BuildingInput {
@@ -50,6 +62,22 @@ type User @aws_cognito_user_pools {
   userType: UserType!
   updatedOn: AWSDateTime
   createdOn: AWSDateTime!
+}
+type Booking @aws_cognito_user_pools {
+  id: ID!
+  user: User!
+  startDate: AWSDate!
+  endDate: AWSDate!
+  apartment: Apartment!
+  status: BookingStatus!
+  updateOn: AWSDateTime!
+  createdOn: AWSDateTime!
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  CANCELLED
 }
 
 input UserInput {
