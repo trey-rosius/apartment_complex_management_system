@@ -12,7 +12,13 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import * as path from "path";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import * as sqs from "aws-cdk-lib/aws-sqs";
 import { Tracing } from "aws-cdk-lib/aws-lambda";
+
+import {
+  DynamoEventSource,
+  SqsDlq,
+} from "aws-cdk-lib/aws-lambda-event-sources";
 
 interface BookingLambdaStackProps extends StackProps {
   acmsGraphqlApi: CfnGraphQLApi;
@@ -25,6 +31,9 @@ export class BookingLamdaStacks extends Stack {
     super(scope, id, props);
 
     const { acmsDatabase, acmsGraphqlApi, apiSchema } = props;
+
+    const deadLetterQueue = new sqs.Queue(this, "DeadLetterQueue");
+
     const signingProfile = new signer.SigningProfile(this, "SigningProfile", {
       platform: signer.Platform.AWS_LAMBDA_SHA384_ECDSA,
     });
@@ -37,15 +46,42 @@ export class BookingLamdaStacks extends Stack {
       }
     );
 
-    const bookingLambda = new NodejsFunction(this, "AcmsBookingHandler", {
-      tracing: Tracing.ACTIVE,
-      codeSigningConfig,
-      runtime: lambda.Runtime.NODEJS_16_X,
-      handler: "handler",
-      entry: path.join(__dirname, "lambda-fns/booking", "app.ts"),
+    /**
+     * booking function
+     */
+    const bookingLambda: NodejsFunction = new NodejsFunction(
+      this,
+      "AcmsBookingHandler",
+      {
+        tracing: Tracing.ACTIVE,
+        codeSigningConfig,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        handler: "handler",
+        entry: path.join(__dirname, "lambda-fns/booking", "app.ts"),
 
-      memorySize: 1024,
-    });
+        memorySize: 1024,
+      }
+    );
+
+    /**
+     * read dynamodb stream
+     *
+     */
+
+    const readDDBStreamLambda: NodejsFunction = new NodejsFunction(
+      this,
+      "ReadDDBStreamHandler",
+      {
+        tracing: Tracing.ACTIVE,
+        codeSigningConfig,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        handler: "handler",
+        entry: path.join(__dirname, "lambda-fns/booking", "app.ts"),
+
+        memorySize: 1024,
+      }
+    );
+
     bookingLambda.role?.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName(
         "service-role/AWSAppSyncPushToCloudWatchLogs"

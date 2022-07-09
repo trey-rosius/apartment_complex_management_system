@@ -31,7 +31,6 @@ input CreateBookingInput {
   startDate: AWSDate!
   endDate: AWSDate!
   bookingStatus: BookingStatus!
-  createdOn: AWSDateTime!
 }
 
 input BuildingInput {
@@ -71,7 +70,7 @@ type Booking @aws_cognito_user_pools {
   endDate: AWSDate!
   apartmentId: String!
   apartment: Apartment!
-  status: BookingStatus!
+  bookingStatus: BookingStatus!
   updateOn: AWSDateTime!
   createdOn: AWSDateTime!
 }

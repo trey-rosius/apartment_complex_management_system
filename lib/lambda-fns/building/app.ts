@@ -1,5 +1,6 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import createBuilding from "./createBuilding";
+import { AppSyncResolverEvent, Context } from "aws-lambda";
 
 const logger = new Logger({ serviceName: "ApartmentComplexManagementApp" });
 
@@ -24,14 +25,17 @@ type BuildingInput = {
   };
 };
 
-exports.handler = async (event: AppSyncEvent, context: any) => {
+exports.handler = async (
+  event: AppSyncResolverEvent<BuildingInput>,
+  context: Context
+) => {
   logger.addContext(context);
   logger.info(
     `appsync event arguments ${event.arguments} and event info ${event.info}`
   );
   switch (event.info.fieldName) {
     case "createBuilding":
-      return await createBuilding(event.arguments.input, logger);
+      return await createBuilding(event.arguments, logger);
 
     default:
       return null;
