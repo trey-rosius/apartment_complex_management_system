@@ -20,9 +20,13 @@ type Mutation {
 
 type Query {
   getUserAccount(id: ID!): User! @aws_cognito_user_pools
+  getBookings(bookingId: String): Booking
 
   getAllUserAccounts(pagination: Pagination): UsersResult!
     @aws_cognito_user_pools(cognito_groups: ["Admins", "Caretakers"])
+
+  getAllBookingsPerApartment(apartmentId: String!): [Booking!]!
+    @aws_cognito_user_pools
 }
 
 input CreateBookingInput {
@@ -69,7 +73,6 @@ type Booking @aws_cognito_user_pools {
   startDate: AWSDate!
   endDate: AWSDate!
   apartmentId: String!
-  apartment: Apartment!
   bookingStatus: BookingStatus!
   updateOn: AWSDateTime!
   createdOn: AWSDateTime!

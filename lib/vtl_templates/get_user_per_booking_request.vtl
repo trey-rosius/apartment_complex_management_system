@@ -1,0 +1,20 @@
+#if($ctx.prev.result.items.size() == 0)
+    #return([{}])
+#end
+#set($keys=[])
+#foreach($item in $ctx.prev.result.items)
+  $util.qr($keys.add({
+    "PK": $util.dynamodb.toDynamoDB("USER#${item.userId}"),
+    "SK": $util.dynamodb.toDynamoDB("USER#${item.userId}")
+  }))
+#end
+{
+    "version": "2018-05-29",
+    "operation": "BatchGetItem",
+    "tables" : {
+        "AcmsDynamoDBTable": {
+            "keys": $util.toJson($keys),
+            "consistentRead": true
+        }
+    }
+}

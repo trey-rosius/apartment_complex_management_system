@@ -1,0 +1,7 @@
+#set($items= [])
+#foreach($item in $ctx.result.data.get("AcmsDynamoDBTable"))
+    #set($user=$ctx.prev.result.items.get($foreach.index))
+    $util.qr($user.put("user",$item))
+    $util.qr($items.add($user))
+#end
+$util.toJson($items)    

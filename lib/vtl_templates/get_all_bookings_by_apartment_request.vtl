@@ -1,0 +1,24 @@
+ #set($gsi1pk = $util.dynamodb.toStringJson("APARTMENT#${ctx.prev.result.apartmentId}"))
+ #set($gsi1sk =$util.dynamodb.toStringJson("BOOKING#"))
+{
+    "version" : "2018-05-29",
+
+    "operation" : "Query",
+   
+
+    "query" : {
+        "expression": "#GSI1PK = :gsi1pk and begins_with(#GSI1SK,:gsi1sk)",
+        "expressionNames":{
+        "#GSI1PK":"GSI1PK",
+        "#GSI1SK":"GSI1SK"
+        },
+        
+        "expressionValues" : {
+            ":gsi1pk" : $gsi1pk,
+            ":gsi1sk" :$gsi1sk
+        }
+    },
+
+    "index": "bookingsPerApartment",
+    "scanIndexForward" : true
+}

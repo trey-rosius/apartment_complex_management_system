@@ -3,7 +3,11 @@ import { Construct } from "constructs";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 
-import { CfnGraphQLApi, CfnGraphQLSchema } from "aws-cdk-lib/aws-appsync";
+import {
+  CfnDataSource,
+  CfnGraphQLApi,
+  CfnGraphQLSchema,
+} from "aws-cdk-lib/aws-appsync";
 import * as iam from "aws-cdk-lib/aws-iam";
 import {
   AttributeType,
@@ -13,11 +17,13 @@ import {
   Table,
 } from "aws-cdk-lib/aws-dynamodb";
 import { readFileSync } from "fs";
+import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 
 export class AcmsStack extends Stack {
   public readonly acmsDatabase: Table;
   public readonly acmsGraphqlApi: CfnGraphQLApi;
   public readonly apiSchema: CfnGraphQLSchema;
+  public readonly acmsTableDatasource: CfnDataSource;
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -43,6 +49,13 @@ export class AcmsStack extends Stack {
           },
         },
       }
+    );
+    const dynamoDBRole = new Role(this, "DynamoDBRole", {
+      assumedBy: new ServicePrincipal("appsync.amazonaws.com"),
+    });
+
+    dynamoDBRole.addManagedPolicy(
+      ManagedPolicy.fromAwsManagedPolicyName("AmazonDynamoDBFullAccess")
     );
 
     const userPoolClient: UserPoolClient = new cognito.UserPoolClient(
@@ -142,6 +155,21 @@ export class AcmsStack extends Stack {
 
       projectionType: ProjectionType.ALL,
     });
+
+    this.acmsTableDatasource = new CfnDataSource(
+      this,
+      "AcmsDynamoDBTableDataSource",
+      {
+        apiId: this.acmsGraphqlApi.attrApiId,
+        name: "AcmsDynamoDBTableDataSource",
+        type: "AMAZON_DYNAMODB",
+        dynamoDbConfig: {
+          tableName: this.acmsDatabase.tableName,
+          awsRegion: this.region,
+        },
+        serviceRoleArn: dynamoDBRole.roleArn,
+      }
+    );
 
     /**
      * Outputs

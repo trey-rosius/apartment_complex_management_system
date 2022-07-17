@@ -51,6 +51,7 @@ new BookingLamdaStacks(app, "BookingLambdaStacks", {
   acmsDatabase: acmsStack.acmsDatabase,
   apiSchema: acmsStack.apiSchema,
   acmsGraphqlApi: acmsStack.acmsGraphqlApi,
+  acmsTableDatasource: acmsStack.acmsTableDatasource,
 });
 
 new DdbStreamLamdaStacks(app, "DdbStreamLambdaStacks", {
