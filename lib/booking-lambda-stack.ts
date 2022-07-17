@@ -126,10 +126,10 @@ export class BookingLamdaStacks extends Stack {
 
         dataSourceName: acmsTableDatasource.name,
         requestMappingTemplate: readFileSync(
-          "./lib/vtl_templates/get_all_bookings_by_apartment_request.vtl"
+          "./lib/vtl_templates/get_all_bookings_per_apartment_request.vtl"
         ).toString(),
         responseMappingTemplate: readFileSync(
-          "./lib/vtl_templates/get_all_bookings_by_apartment_response.vtl"
+          "./lib/vtl_templates/get_all_bookings_per_apartment_response.vtl"
         ).toString(),
         functionVersion: "2018-05-29",
         name: "getAllBookingsFunction",
