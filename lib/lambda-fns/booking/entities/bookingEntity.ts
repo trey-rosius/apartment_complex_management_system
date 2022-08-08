@@ -62,6 +62,9 @@ export class BookingEntity {
       createdOn: this.createdOn,
     };
   }
+  updateStatus() {
+    return {};
+  }
 
   graphQlReturn() {
     return {

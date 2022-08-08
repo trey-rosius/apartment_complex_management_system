@@ -1,6 +1,7 @@
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 type Mutation {
@@ -16,6 +17,12 @@ type Mutation {
 
   createApartmentBooking(input: CreateBookingInput!): Booking!
     @aws_cognito_user_pools(cognito_groups: ["Tenants"])
+}
+
+type Subscription {
+  onCreateApartmentBooking: Booking
+    @aws_cognito_user_pools
+    @aws_subscribe(mutations: ["createApartmentBooking"])
 }
 
 type Query {
@@ -117,6 +124,7 @@ type Apartment @aws_cognito_user_pools {
   tenant: User!
   caretaker: User!
   apartmentType: ApartmentType!
+  apartmentStatus: ApartmentStatus!
   kitchen: Boolean!
   numberOfRooms: Int!
   createdOn: AWSDateTime!
@@ -127,6 +135,7 @@ input ApartmentInput @aws_cognito_user_pools {
   buildingId: String!
   numberOfRooms: Int!
   apartmentType: ApartmentType!
+  apartmentStatus: ApartmentStatus!
 }
 type UsersResult @aws_cognito_user_pools {
   items: [User!]!
@@ -142,6 +151,10 @@ enum ApartmentType {
   SINGLE_ROOM
   DOUBLE_ROOM
   VILLA
+}
+enum ApartmentStatus {
+  VACANT
+  OCCUPIED
 }
 enum UserType {
   ADMIN
