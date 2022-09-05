@@ -18,7 +18,6 @@ import {
 } from "aws-cdk-lib/aws-dynamodb";
 import { readFileSync } from "fs";
 import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { create } from "domain";
 
 export class AcmsStack extends Stack {
   public readonly acmsDatabase: Table;
