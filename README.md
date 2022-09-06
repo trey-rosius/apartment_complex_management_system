@@ -11,6 +11,10 @@ ACMS is an attempt at using Serverless technology to build a system where buildi
 - Keep track of occupied and vacant apartments, bookings,payments, and a lot more in each of their building.
 - And other useful information that’ll provide more insights on the management of their buildings.
 
+## Solutions Architecture
+
+![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/apartment.jpeg)
+
 ## ERD(Entity Relationship Diagram)
 
 ### Entities
@@ -36,8 +40,25 @@ Users and Payments share a one to many relationship
 
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/entity_relationship_apartment.jpeg)
 
-### Single Table Design Data Representation
+### Single Table Design DATABASE SCHEMA
+
+| Entity                 | PK                  | SK                    | GSI1PK                | GSI1SK            |
+| ---------------------- | ------------------- | --------------------- | --------------------- | ----------------- |
+| Building               | USER#USERID         | BUILDING#BUILDINGID   |                       |                   |
+| Apartment              | BUILDING#BUILDINGID | APARTMENT#APARTMENTID |                       |                   |
+| Booking                | USER#USERID         | APARTMENT#APARTMENTID | APARTMENT#APARTMENTID | BOOKING#BOOKINGID |
+| Payment                | USER#ID             | PAYMENT#PAYMENTID     | APARTMENT#APARTMENTID | PAYMENT#          |
+| User                   | USER#USERID         | USER#USEREMAIL        |                       |                   |
+| Messages/Notifications | USER#USERID         | MESSAGE#MESSAGEID     |                       |                   |
+
+NOSQL WORKBENCH
 
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/acms-table.png)
+
+### Get All Apartments Per Building
+
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/GSI_acms-table_getAllApartmentsPerBuilding.png)
+
+### Get All Bookings Per Apartment
+
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/GSI_acms-table_getAllBookingsPerApartment.png)
