@@ -66,7 +66,6 @@ export class DdbStreamLamdaStacks extends Stack {
     );
 
     //add dynamodb stream event source
-
     readDDBStreamLambda.addEventSource(
       new DynamoEventSource(acmsDatabase, {
         startingPosition: lambda.StartingPosition.TRIM_HORIZON,

@@ -11,6 +11,8 @@ ACMS is an attempt at using Serverless technology to build a system where buildi
 - Keep track of occupied and vacant apartments, bookings,payments, and a lot more in each of their building.
 - And other useful information that’ll provide more insights on the management of their buildings.
 
+In this series, we'll build and deploy a serverless GraphQL API with Appsync,CDK and Typescript.
+
 ## Solutions Architecture
 
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/apartment.jpeg)
@@ -54,7 +56,7 @@ SK:USER#EMAIL
 - Create/Update/Read/List/Delete Buildings
 
 ```jsx
-PK:USER#USERID
+PK:BUILDING
 SK:BUILDING#BUILDINGID
 ```
 
@@ -89,13 +91,6 @@ PK:APARTMENTS#APARTMENTID
 SK:BOOKINGS#
 ```
 
-- assign a caretaker to a particular building
-
-```jsx
-BUILDING#BUILDINGID
-USER#USERNAME
-```
-
 Tenants
 
 - Create/update/read/delete account
@@ -109,7 +104,7 @@ SK:USER#EMAIL
 - List all Buildings in their Area
 
 ```jsx
-use `longitude` and `latitude`
+filter with `longitude` and `latitude`
 PK:BUILDING
 SK:BUILDING#BUILDINGID
 ```
@@ -117,13 +112,12 @@ SK:BUILDING#BUILDINGID
 - List available apartments for each building
 
 ```jsx
-conditional expressiong `where status==available`
+conditional expression `where status==available`
 PK:BUILDING#BUILDINGID
 SK:APARTMENT#
 ```
 
 - Book an apartment
--
 
 ```jsx
 
@@ -135,22 +129,6 @@ GSI
 GSI1PK:BUILDING#BUILDINGID
 GSI1SK:APARTMENT#APARTMENTID#STATUS
 ```
-
-- View all apartments booked by you
-
-```jsx
-starts_with(APARTMENT#)
-condition booked_by == userId
-PK:BUILDING#BUILDINGID
-SK:APARTMENT#
-```
-
-- Pay for apartment once booking status == ‘ACCEPTED’
-
-Caretaker
-
-- View all apartments(Available, unavailable) in Building
--
 
 ### Single Table Design DATABASE SCHEMA
 
@@ -178,3 +156,17 @@ Caretaker
 ### Get All Buildings Per User
 
 ![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/GSI_acms-table_getAllBuildingsPerUser.png)
+
+## Prerequisites
+
+Please make sure you have these dependencies installed.
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
+[AWS ACCOUNT AND USER](https://cdkworkshop.com/15-prerequisites/200-account.html)
+[Node Js](https://cdkworkshop.com/15-prerequisites/300-nodejs.html)
+[AWS CDK ToolKit](https://cdkworkshop.com/15-prerequisites/500-toolkit.html)
+
+- [AWS AppSync](https://aws.amazon.com/appsync/) is a fully managed serverless service that makes it easy to develop GraphQL APIs in the cloud. It handles the heavy lifting of managing a complex GraphQL backend infrastructure, securely connecting to data sources, adding caches to improve performance, subscriptions to support real-time updates, and client-side data stores that keep offline clients in sync.
+
+- GraphQL provides a flexible typed data query language for APIs as well as a runtime to fulfill these queries
+
+- The [AWS Cloud Development Kit (AWS CDK)](https://aws.amazon.com/cdk/) is an open-source software development framework to define your cloud application resources using familiar programming languages
