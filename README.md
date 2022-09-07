@@ -437,7 +437,111 @@ enum UserType {
 }
 ```
 
-In the schema file, we have different access levels for mutations and queries.
-For example, only `Admin` can create a building or an apartment.
-Both `Admins` and `Caretakers` can `getAllBookingsPerApartment`.
-And a lot more.
+In the schema file above, we have different access levels for mutations and queries.
+For example,
+
+- Only `Admin` can create a building or an apartment.
+- Both `Admins` and `Caretakers` can `getAllBookingsPerApartment`.
+  And a lot more.
+
+Let's go ahead to define
+
+- GraphQL API
+- GraphQL Schema
+- GraphQL Datasource
+
+Since we'll be needing the graphql api and datasource construct definitions in other stacks, we need to expose them.
+
+Here's how it's done.
+Firstly, initialize your construct like so
+
+```js
+export class AcmsStack extends Stack {
+  public readonly acmsGraphqlApi: CfnGraphQLApi;
+  public readonly apiSchema: CfnGraphQLSchema;
+  public readonly acmsTableDatasource: CfnDataSource;
+
+```
+
+Then, define them like so
+
+```js
+/**
+ * GraphQL API
+ */
+this.acmsGraphqlApi = new CfnGraphQLApi(this, "acmsGraphqlApi", {
+  name: "ACMS",
+  authenticationType: "API_KEY",
+
+  additionalAuthenticationProviders: [
+    {
+      authenticationType: "AMAZON_COGNITO_USER_POOLS",
+
+      userPoolConfig: {
+        userPoolId: userPool.userPoolId,
+        awsRegion: "us-east-2",
+      },
+    },
+  ],
+  userPoolConfig: {
+    userPoolId: userPool.userPoolId,
+    defaultAction: "ALLOW",
+    awsRegion: "us-east-2",
+  },
+
+  logConfig: {
+    fieldLogLevel: "ALL",
+    cloudWatchLogsRoleArn: cloudWatchRole.roleArn,
+  },
+  xrayEnabled: true,
+});
+
+/**
+ * Graphql Schema
+ */
+
+this.apiSchema = new CfnGraphQLSchema(this, "ACMSGraphqlApiSchema", {
+  apiId: this.acmsGraphqlApi.attrApiId,
+  definition: readFileSync("./schema/schema.graphql").toString(),
+});
+
+this.acmsTableDatasource = new CfnDataSource(
+  this,
+  "AcmsDynamoDBTableDataSource",
+  {
+    apiId: this.acmsGraphqlApi.attrApiId,
+    name: "AcmsDynamoDBTableDataSource",
+    type: "AMAZON_DYNAMODB",
+    dynamoDbConfig: {
+      tableName: this.acmsDatabase.tableName,
+      awsRegion: this.region,
+    },
+    serviceRoleArn: dynamoDBRole.roleArn,
+  }
+);
+```
+
+The default authentication type for the GraphQl api is the `API_KEY`.
+With the auth type, users can see a list of all available buildings on the platform.
+But they'll need to be signed in and assigned to a particular group, in-order to progress through the rest of the api endpoints.
+
+## Outputs
+
+```js
+new CfnOutput(this, "UserPoolId", {
+  value: userPool.userPoolId,
+});
+new CfnOutput(this, "UserPoolClientId", {
+  value: userPoolClient.userPoolClientId,
+});
+
+new CfnOutput(this, "GraphQLAPI ID", {
+  value: this.acmsGraphqlApi.attrApiId,
+});
+
+new CfnOutput(this, "GraphQLAPI URL", {
+  value: this.acmsGraphqlApi.attrGraphQlUrl,
+});
+```
+
+You can view the complete code here
