@@ -174,7 +174,23 @@ Please make sure you have these dependencies installed before proceeding.
 
 ## GET STARTED
 
-We are going to have 5 stacks
+### Initialize CDK app
+
+Firstly, create a new project directory. I’m using a mac, so i’ll create mine and cd into it
+
+`mkdir acms`
+
+`cd acms`
+
+Create a CDK typescript application in your newly created directory
+
+`cdk init --language typescript`
+
+Once created, open up the newly created CDK app in your favorite IDE.
+
+### Stacks
+
+We are going to have 5 stacks in total.
 
 - The main application Stack(Defines the Appsync API, Database, Datasource etc for the complete app)
 - A User Stack (For User Resources)
@@ -182,4 +198,23 @@ We are going to have 5 stacks
 - An Apartment Stack (For Apartment Resources)
 - A Bookings Stack (For Booking Resources)
 
-We'll initialize our DB
+To provision infrastructure resources, all constructs that represent AWS resources must be defined, directly or indirectly, within the scope of a Stack construct.
+
+An App is a container for one or more stacks: it serves as each stack's scope. Stacks within a single App can easily refer to each others' resources (and attributes of those resources).
+
+The AWS CDK infers dependencies between stacks so that they can be deployed in the correct order. You can deploy any or all of the stacks defined within an app at with a single cdk deploy command.
+
+Our app is defined in the `bin` folder, while our stacks are in the `lib` folder.
+
+Add your `account` and `region` to the `env` object in the cdk app file located in the `bin` folder.
+
+Here's how mine looks like
+
+```js
+const app = new cdk.App();
+const acmsStack = new AcmsStack(app, "AcmsStack", {
+  env: { account: "13xxxxxxxxxx", region: "us-east-2" },
+});
+```
+
+`AcmsStack` file is located the `lib` folder.
