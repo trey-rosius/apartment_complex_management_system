@@ -4,15 +4,6 @@ import { AppSyncResolverEvent, Context } from "aws-lambda";
 
 const logger = new Logger({ serviceName: "ApartmentComplexManagementApp" });
 
-type AppSyncEvent = {
-  info: {
-    fieldName: string;
-  };
-  arguments: {
-    input: BuildingInput;
-  };
-};
-
 type BuildingInput = {
   name: string;
   userId: string;

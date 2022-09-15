@@ -2,7 +2,7 @@ import { Logger } from "@aws-lambda-powertools/logger";
 import createApartmentBooking from "./createApartmentBooking";
 import { AppSyncResolverEvent, Context } from "aws-lambda";
 import CreateBookingInput from "./CreateBookingInput";
-import getBookingsPerApartment from "./getBookingsPerApartment";
+
 import { Tracer } from "@aws-lambda-powertools/tracer";
 
 const namespace = "ApartmentComplexManagementApp";
@@ -17,14 +17,11 @@ exports.handler = async (
 ) => {
   logger.addContext(context);
   logger.info(
-    `appsync event arguments ${event.arguments} and event info ${event.info}`
+    `appsync event arguments ${event.arguments.input} and event info ${event.info}`
   );
   switch (event.info.fieldName) {
     case "createApartmentBooking":
       return await createApartmentBooking(event.arguments, logger);
-    case "getBookingsPerApartment":
-      return await getBookingsPerApartment(event.arguments.apartmentId, logger);
-
     default:
       return null;
   }

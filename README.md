@@ -190,13 +190,14 @@ Once created, open up the newly created CDK app in your favorite IDE.
 
 ### Stacks
 
-We are going to have 5 stacks in total.
+We are going to have 6 stacks in total.
 
 - The main application Stack(Defines the Appsync API, Database, Datasource etc for the complete app)
 - A User Stack (For User Resources)
 - A Building Stack (For Building Resources)
 - An Apartment Stack (For Apartment Resources)
 - A Bookings Stack (For Booking Resources)
+- DynamoDb Stream Stack
 
 To provision infrastructure resources, all constructs that represent AWS resources must be defined, directly or indirectly, within the scope of a Stack construct.
 
@@ -522,7 +523,8 @@ this.acmsTableDatasource = new CfnDataSource(
 ```
 
 The default authentication type for the GraphQl api is the `API_KEY`.
-With the auth type, users can see a list of all available buildings on the platform.
+
+With this authentication type, users can see a list of all available buildings on the platform.
 But they'll need to be signed in and assigned to a particular group, in-order to progress through the rest of the api endpoints.
 
 ## Outputs
@@ -544,4 +546,4 @@ new CfnOutput(this, "GraphQLAPI URL", {
 });
 ```
 
-You can view the complete code here
+You can view the complete code [here](https://github.com/trey-rosius/apartment_complex_management_system/blob/master/lib/acms-stack.ts)

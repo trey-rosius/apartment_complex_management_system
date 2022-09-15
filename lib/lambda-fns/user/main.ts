@@ -1,34 +1,22 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import createUserAccount from "./createUserAccounts";
+import { AppSyncResolverEvent, Context } from "aws-lambda";
+import UserInput from "./CreateUserInput";
 
 const logger = new Logger({ serviceName: "ApartmentComplexManagementApp" });
 
-type AppSyncEvent = {
-  info: {
-    fieldName: string;
-  };
-  arguments: {
-    userId: string;
-    input: UserInput;
-  };
-};
-
-type UserInput = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  verified: boolean;
-  userType: string;
-};
-
-exports.handler = async (event: AppSyncEvent, context: any) => {
+exports.handler = async (
+  event: AppSyncResolverEvent<UserInput>,
+  context: Context
+) => {
   logger.addContext(context);
   logger.info(
-    `appsync event arguments ${event.arguments} and event info ${event.info}`
+    `appsync event arguments ${JSON.stringify(event.arguments.input)}`
   );
+
   switch (event.info.fieldName) {
     case "createUserAccount":
-      return await createUserAccount(event.arguments.input, logger);
+      return await createUserAccount(event.arguments, logger);
 
     default:
       return null;

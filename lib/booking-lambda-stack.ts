@@ -1,4 +1,4 @@
-import { Stack, StackProps } from "aws-cdk-lib";
+import { CfnOutput, Stack, StackProps } from "aws-cdk-lib";
 import {
   CfnDataSource,
   CfnFunctionConfiguration,
@@ -17,6 +17,7 @@ import * as sqs from "aws-cdk-lib/aws-sqs";
 import { Tracing } from "aws-cdk-lib/aws-lambda";
 import { aws_iam } from "aws-cdk-lib";
 import { readFileSync } from "fs";
+import { SqsDestination } from "aws-cdk-lib/aws-lambda-destinations";
 
 interface BookingLambdaStackProps extends StackProps {
   acmsGraphqlApi: CfnGraphQLApi;
@@ -41,6 +42,10 @@ export class BookingLamdaStacks extends Stack {
       resources: ["*"],
     });
 
+    /**
+     * Create SQS Queue
+     */
+    const queue = new sqs.Queue(this, "bookingQueue");
     const signingProfile = new signer.SigningProfile(this, "SigningProfile", {
       platform: signer.Platform.AWS_LAMBDA_SHA384_ECDSA,
     });
@@ -52,6 +57,25 @@ export class BookingLamdaStacks extends Stack {
         signingProfiles: [signingProfile],
       }
     );
+
+    /**
+     *
+     * IAM role
+     */
+    const lambdaRole = new Role(this, "QueueConsumerFunctionRole", {
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+      managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSLambdaSQSQueueExecutionRole"
+        ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSLambdaBasicExecutionRole"
+        ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSAppSyncPushToCloudWatchLogs"
+        ),
+      ],
+    });
 
     /**
      * booking function
@@ -66,23 +90,38 @@ export class BookingLamdaStacks extends Stack {
         handler: "handler",
         entry: path.join(__dirname, "lambda-fns/booking", "app.ts"),
         initialPolicy: [policyStatement],
+        role: lambdaRole,
 
         memorySize: 1024,
+        onFailure: new SqsDestination(deadLetterQueue),
       }
     );
 
-    bookingLambda.role?.addManagedPolicy(
-      ManagedPolicy.fromAwsManagedPolicyName(
-        "service-role/AWSAppSyncPushToCloudWatchLogs"
-      )
-    );
+    /**
+     * lambda to sqs
+     */
 
+    const eventSourceMapping = new lambda.EventSourceMapping(
+      this,
+      "QueueConsumerFunctionBookingEvent",
+      {
+        target: bookingLambda,
+        batchSize: 10,
+        eventSourceArn: queue.queueArn,
+      }
+    );
     const appsyncLambdaRole = new Role(this, "LambdaRole", {
       assumedBy: new ServicePrincipal("appsync.amazonaws.com"),
+      managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSLambdaSQSQueueExecutionRole"
+        ),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSLambdaBasicExecutionRole"
+        ),
+      ],
     });
-    appsyncLambdaRole.addManagedPolicy(
-      ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess")
-    );
+
     const lambdaDataSources: CfnDataSource = new CfnDataSource(
       this,
       "ACMSBookingLambdaDatasource",
@@ -180,5 +219,21 @@ export class BookingLamdaStacks extends Stack {
     getBookingPerApartmentResolver.addDependsOn(apiSchema);
     acmsDatabase.grantFullAccess(bookingLambda);
     bookingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
+    bookingLambda.addEnvironment("BOOKING_QUEUE_URL", queue.queueUrl);
+
+    new CfnOutput(this, "SQSqueueName", {
+      value: queue.queueName,
+      description: "SQS queue name",
+    });
+
+    new CfnOutput(this, "SQSqueueARN", {
+      value: queue.queueArn,
+      description: "SQS queue ARN",
+    });
+
+    new CfnOutput(this, "SQSqueueURL", {
+      value: queue.queueUrl,
+      description: "SQS queue URL",
+    });
   }
 }

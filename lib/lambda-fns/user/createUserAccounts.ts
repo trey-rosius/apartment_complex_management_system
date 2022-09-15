@@ -2,14 +2,8 @@ import { Logger } from "@aws-lambda-powertools/logger";
 import UserEntity from "./userEntity";
 import { DynamoDB } from "aws-sdk";
 import { uuid } from "../../utils";
+import UserInput from "./CreateUserInput";
 
-type UserInput = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  verified: boolean;
-  userType: string;
-};
 type UserReturnParameters = {
   id: string;
   ENTITY: string;
@@ -23,7 +17,7 @@ type UserReturnParameters = {
 };
 
 async function createUserAccount(
-  input: UserInput,
+  appsyncInput: UserInput,
   logger: Logger
 ): Promise<UserReturnParameters> {
   const documentClient = new DynamoDB.DocumentClient();
@@ -37,11 +31,11 @@ async function createUserAccount(
 
   const userInput: UserEntity = new UserEntity({
     id: id,
-    ...input,
+    ...appsyncInput.input,
     createdOn,
   });
 
-  logger.info(`create user input info", ${userInput}`);
+  logger.info(`create user input info", ${JSON.stringify(userInput)}`);
   const params = {
     TableName: tableName,
     Item: userInput.toItem(),
