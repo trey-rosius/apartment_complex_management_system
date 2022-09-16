@@ -1,15 +1,14 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import { DynamoDB } from "aws-sdk";
 import { uuid } from "../../utils";
+import CreateApartmentInput from "./CreateApartmentInput";
+
 import { ApartmentEntity } from "./entities/apartmentEntity";
 
-type ApartmentInput = {
-  apartmentNumber: string;
-  buildingId: string;
-  numberOfRooms: number;
-  apartmentType: string;
-};
-async function createApartment(input: ApartmentInput, logger: Logger) {
+async function createApartment(
+  appsyncInput: CreateApartmentInput,
+  logger: Logger
+) {
   const documentClient = new DynamoDB.DocumentClient();
   let tableName = process.env.ACMS_DB;
   const createdOn = Date.now().toString();
@@ -22,7 +21,7 @@ async function createApartment(input: ApartmentInput, logger: Logger) {
 
   const apartmentInput: ApartmentEntity = new ApartmentEntity({
     id: id,
-    ...input,
+    ...appsyncInput.input,
     createdOn,
   });
 

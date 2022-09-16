@@ -3,18 +3,10 @@ import { DynamoDB } from "aws-sdk";
 import { uuid } from "../../utils";
 import { BuildingEntity } from "./entities/buildingEntity";
 
-type BuildingInput = {
-  name: string;
-  userId: string;
-  numberOfApartments: number;
-  address: {
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    country: string;
-  };
-};
-async function createBuilding(buildingInput: BuildingInput, logger: Logger) {
+async function createBuilding(
+  appsyncInput: CreateBuildingInput,
+  logger: Logger
+) {
   const documentClient = new DynamoDB.DocumentClient();
   let tableName = process.env.ACMS_DB;
   const createdOn = Date.now().toString();
@@ -26,11 +18,11 @@ async function createBuilding(buildingInput: BuildingInput, logger: Logger) {
 
   const input: BuildingEntity = new BuildingEntity({
     id: id,
-    ...buildingInput,
+    ...appsyncInput.input,
     createdOn,
   });
 
-  logger.info(`create building input info", ${buildingInput}`);
+  logger.info(`create building input info", ${JSON.stringify(input)}`);
   const params = {
     TableName: tableName,
     Item: input.toItem(),

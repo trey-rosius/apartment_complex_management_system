@@ -4,25 +4,15 @@ import { AppSyncResolverEvent, Context } from "aws-lambda";
 
 const logger = new Logger({ serviceName: "ApartmentComplexManagementApp" });
 
-type BuildingInput = {
-  name: string;
-  userId: string;
-  numberOfApartments: number;
-  address: {
-    streetAddress: string;
-    postalCode: string;
-    city: string;
-    country: string;
-  };
-};
-
 exports.handler = async (
-  event: AppSyncResolverEvent<BuildingInput>,
+  event: AppSyncResolverEvent<CreateBuildingInput>,
   context: Context
 ) => {
   logger.addContext(context);
   logger.info(
-    `appsync event arguments ${event.arguments} and event info ${event.info}`
+    `appsync event arguments ${JSON.stringify(
+      event.arguments.input
+    )} and event info ${event.info}`
   );
   switch (event.info.fieldName) {
     case "createBuilding":

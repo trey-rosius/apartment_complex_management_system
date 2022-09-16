@@ -32,8 +32,12 @@ export class BookingLamdaStacks extends Stack {
 
     const { acmsDatabase, acmsGraphqlApi, apiSchema, acmsTableDatasource } =
       props;
+    /**
+     * Create SQS Queue and Dead letter Queue
+     */
 
     const deadLetterQueue = new sqs.Queue(this, "DeadLetterQueue");
+    const queue = new sqs.Queue(this, "bookingQueue", deadLetterQueue);
 
     // The code that defines your stack goes here
     const policyStatement = new aws_iam.PolicyStatement({
@@ -42,10 +46,6 @@ export class BookingLamdaStacks extends Stack {
       resources: ["*"],
     });
 
-    /**
-     * Create SQS Queue
-     */
-    const queue = new sqs.Queue(this, "bookingQueue");
     const signingProfile = new signer.SigningProfile(this, "SigningProfile", {
       platform: signer.Platform.AWS_LAMBDA_SHA384_ECDSA,
     });
@@ -68,9 +68,7 @@ export class BookingLamdaStacks extends Stack {
         ManagedPolicy.fromAwsManagedPolicyName(
           "service-role/AWSLambdaSQSQueueExecutionRole"
         ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          "service-role/AWSLambdaBasicExecutionRole"
-        ),
+        ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"),
         ManagedPolicy.fromAwsManagedPolicyName(
           "service-role/AWSAppSyncPushToCloudWatchLogs"
         ),
@@ -116,9 +114,7 @@ export class BookingLamdaStacks extends Stack {
         ManagedPolicy.fromAwsManagedPolicyName(
           "service-role/AWSLambdaSQSQueueExecutionRole"
         ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          "service-role/AWSLambdaBasicExecutionRole"
-        ),
+        ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"),
       ],
     });
 
@@ -218,6 +214,8 @@ export class BookingLamdaStacks extends Stack {
     getResultBookingPerApartmentResolver.addDependsOn(apiSchema);
     getBookingPerApartmentResolver.addDependsOn(apiSchema);
     acmsDatabase.grantFullAccess(bookingLambda);
+    queue.grantSendMessages(bookingLambda);
+
     bookingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
     bookingLambda.addEnvironment("BOOKING_QUEUE_URL", queue.queueUrl);
 

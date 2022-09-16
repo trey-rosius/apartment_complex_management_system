@@ -41,14 +41,21 @@ export class BuildingEntity {
 
   key() {
     return {
-      PK: `BUILDING#${this.id}`,
+      PK: "BUILDING",
       SK: `BUILDING#${this.id}`,
+    };
+  }
+  gsi2() {
+    return {
+      GSI2PK: `USER#${this.userId}`,
+      GSI2SK: `BUILDING#${this.id}`,
     };
   }
 
   toItem() {
     return {
       ...this.key(),
+      ...this.gsi2(),
       id: this.id,
       ENTITY: "BUILDING",
       name: this.name,

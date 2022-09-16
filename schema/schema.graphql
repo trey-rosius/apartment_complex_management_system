@@ -1,7 +1,6 @@
 schema {
   query: Query
   mutation: Mutation
-  subscription: Subscription
 }
 
 type Mutation {
@@ -15,14 +14,8 @@ type Mutation {
   createApartment(input: ApartmentInput): Apartment!
     @aws_cognito_user_pools(cognito_groups: ["Admins"])
 
-  createApartmentBooking(input: CreateBookingInput!): Booking!
+  createApartmentBooking(input: CreateBookingInput!): Boolean!
     @aws_cognito_user_pools(cognito_groups: ["Tenants"])
-}
-
-type Subscription {
-  onCreateApartmentBooking: Booking
-    @aws_cognito_user_pools
-    @aws_subscribe(mutations: ["createApartmentBooking"])
 }
 
 type Query {
@@ -134,6 +127,7 @@ input ApartmentInput @aws_cognito_user_pools {
   apartmentNumber: String!
   buildingId: String!
   numberOfRooms: Int!
+  kitchen: Boolean!
   apartmentType: ApartmentType!
   apartmentStatus: ApartmentStatus!
 }

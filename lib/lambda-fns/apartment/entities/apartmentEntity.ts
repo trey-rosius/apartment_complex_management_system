@@ -5,6 +5,7 @@ interface ApartmentParameters {
   numberOfRooms: number;
   apartmentType: string;
   apartmentStatus: string;
+  kitchen: boolean;
   createdOn: string;
 }
 
@@ -15,6 +16,7 @@ export class ApartmentEntity {
   numberOfRooms: number;
   apartmentType: string;
   apartmentStatus: string;
+  kitchen: boolean;
   createdOn: string;
   constructor({
     id,
@@ -23,6 +25,7 @@ export class ApartmentEntity {
     numberOfRooms,
     apartmentType,
     apartmentStatus,
+    kitchen,
     createdOn,
   }: ApartmentParameters) {
     this.id = id;
@@ -31,6 +34,7 @@ export class ApartmentEntity {
     this.numberOfRooms = numberOfRooms;
     this.apartmentStatus = apartmentStatus;
     this.apartmentType = apartmentType;
+    this.kitchen = kitchen;
     this.createdOn = createdOn;
   }
 
@@ -49,6 +53,7 @@ export class ApartmentEntity {
       apartmentNumber: this.apartmentNumber,
       buildingId: this.buildingId,
       numberOfRooms: this.numberOfRooms,
+      kitchen: this.kitchen,
       apartmentStatus: this.apartmentStatus,
       apartmentType: this.apartmentType,
       createdOn: this.createdOn,
@@ -61,6 +66,7 @@ export class ApartmentEntity {
       buildingId: this.buildingId,
       numberOfRooms: this.numberOfRooms,
       apartmentType: this.apartmentType,
+      kitchen: this.kitchen,
       apartmentStatus: this.apartmentStatus,
       createdOn: this.createdOn,
     };

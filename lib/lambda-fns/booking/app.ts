@@ -17,7 +17,9 @@ exports.handler = async (
 ) => {
   logger.addContext(context);
   logger.info(
-    `appsync event arguments ${event.arguments.input} and event info ${event.info}`
+    `appsync event arguments ${JSON.stringify(
+      event.arguments.input
+    )} and event info ${event.info}`
   );
   switch (event.info.fieldName) {
     case "createApartmentBooking":
