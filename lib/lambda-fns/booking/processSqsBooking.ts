@@ -21,7 +21,7 @@ exports.handler = async (event: SQSEvent, context: Context) => {
 
   logger.info(`SQS events are ${JSON.stringify(event.Records)}`);
 
-  event.Records.forEach(async (value: SQSRecord) => {
+  const promises = event.Records.map(async (value: SQSRecord) => {
     try {
       const bookingDetails: PutItemInputAttributeMap = JSON.parse(value.body);
       if (tableName === undefined) {
@@ -30,20 +30,7 @@ exports.handler = async (event: SQSEvent, context: Context) => {
       }
       const params = {
         TableName: tableName,
-        Item: {
-          PK: bookingDetails.PK,
-          SK: bookingDetails.SK,
-          GSI1PK: bookingDetails.GSI1PK,
-          GSI1SK: bookingDetails.GSI1SK,
-          ENTITY: bookingDetails.ENTITY,
-          id: bookingDetails.id,
-          userId: bookingDetails.userId,
-          apartmentId: bookingDetails.apartmentId,
-          startDate: bookingDetails.startDate,
-          endDate: bookingDetails.endDate,
-          bookingStatus: bookingDetails.bookingStatus,
-          createdOn: bookingDetails.createdOn,
-        },
+        Item: bookingDetails,
       };
 
       logger.info(`put parameters for booking is ${JSON.stringify(params)}`);
@@ -53,10 +40,10 @@ exports.handler = async (event: SQSEvent, context: Context) => {
         `an error occured during put booking ${JSON.stringify(error)}`
       );
       failedMessageIds.push(value.messageId);
-
-      logger.info(`item failed message ids ${value.messageId}`);
     }
   });
+  // execute all promises
+  await Promise.all(promises);
 
   return {
     batchItemFailures: failedMessageIds.map((id) => {

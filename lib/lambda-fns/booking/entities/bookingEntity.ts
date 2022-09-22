@@ -37,14 +37,14 @@ export class BookingEntity {
 
   key() {
     return {
-      PK: `USER#${this.userId}`,
-      SK: `APARTMENT#${this.apartmentId}`,
+      PK: `APARTMENT#${this.apartmentId}`,
+      SK: `BOOKING#${this.id}`,
     };
   }
   gsi1Key() {
     return {
-      GSI1PK: `APARTMENT#${this.apartmentId}`,
-      GSI1SK: `BOOKING#${this.id}`,
+      GSI1PK: `USER#${this.userId}`,
+      GSI1SK: `APARTMENT#${this.apartmentId}`,
     };
   }
 

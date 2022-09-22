@@ -242,7 +242,8 @@ export class BookingLamdaStacks extends Stack {
 
     createApartmentBookingResolver.addDependsOn(apiSchema);
     getResultBookingPerApartmentResolver.addDependsOn(apiSchema);
-    acmsDatabase.grantFullAccess(processSQSLambda);
+    acmsDatabase.grantReadData(processSQSLambda);
+    acmsDatabase.grantReadData(bookingLambda);
     queue.grantSendMessages(bookingLambda);
     queue.grantConsumeMessages(processSQSLambda);
     bookingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
