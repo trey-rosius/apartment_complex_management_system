@@ -1,9 +1,10 @@
 import { Logger } from "@aws-lambda-powertools/logger";
-import createApartmentBooking from "./createApartmentBooking";
+
 import { AppSyncResolverEvent, Context } from "aws-lambda";
 import CreateBookingInput from "./CreateBookingInput";
 
 import { Tracer } from "@aws-lambda-powertools/tracer";
+import createApartmentBooking from "./createApartmentBooking";
 
 const namespace = "ApartmentComplexManagementApp";
 const serviceName = "bookingHandler";
@@ -24,6 +25,7 @@ exports.handler = async (
   switch (event.info.fieldName) {
     case "createApartmentBooking":
       return await createApartmentBooking(event.arguments, logger);
+
     default:
       return null;
   }

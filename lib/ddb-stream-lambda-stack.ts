@@ -32,7 +32,7 @@ export class DdbStreamLamdaStacks extends Stack {
 
     const { acmsDatabase, acmsGraphqlApi, apiSchema } = props;
 
-    const deadLetterQueue = new sqs.Queue(this, "DeadLetterQueue");
+    const deadLetterQueue = new sqs.Queue(this, "DeadLetterQueueDDB");
 
     const signingProfile = new signer.SigningProfile(this, "SigningProfile", {
       platform: signer.Platform.AWS_LAMBDA_SHA384_ECDSA,

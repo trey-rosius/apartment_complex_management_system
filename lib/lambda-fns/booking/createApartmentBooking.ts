@@ -13,12 +13,8 @@ async function createApartmentBooking(
   let BOOKING_QUEUE_URL = process.env.BOOKING_QUEUE_URL;
   const createdOn = Date.now().toString();
   const id: string = uuid();
-  const sqs = new SQS({});
+  const sqs = new SQS();
 
-  if (tableName === undefined) {
-    logger.error(`Couldn't get the table name`);
-    tableName = "AcmsDynamoDBTable";
-  }
   if (BOOKING_QUEUE_URL === undefined) {
     logger.error(`Couldn't get the queue url name`);
     throw Error("Couldn't get queue url");
@@ -50,19 +46,6 @@ async function createApartmentBooking(
     logger.info(`an error occured while sending message to sqs", ${error}`);
     throw Error(`an error occured while sending message to sqs", ${error}`);
   }
-
-  /*
-  try {
-    await documentClient.put(params).promise();
-    return bookingInput.graphQlReturn();
-  } catch (error: any) {
-    logger.error(
-      `an error occured while creating an apartment booking ${error}`
-    );
-    throw Error(`an error occured ${error}`);
-  }
-
-  */
 }
 
 export default createApartmentBooking;

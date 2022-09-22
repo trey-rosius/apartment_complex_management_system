@@ -36,10 +36,14 @@ export class BookingLamdaStacks extends Stack {
      * Create SQS Queue and Dead letter Queue
      */
 
-    const deadLetterQueue = new sqs.Queue(this, "DeadLetterQueue");
-    const queue = new sqs.Queue(this, "bookingQueue", deadLetterQueue);
+    const dlq = new sqs.Queue(this, "DeadLetterQueue");
+    const queue = new sqs.Queue(this, "bookingQueue", {
+      deadLetterQueue: {
+        queue: dlq,
+        maxReceiveCount: 10,
+      },
+    });
 
-    // The code that defines your stack goes here
     const policyStatement = new aws_iam.PolicyStatement({
       effect: aws_iam.Effect.ALLOW,
       actions: ["cloudwatch:PutMetricData"],
@@ -60,14 +64,28 @@ export class BookingLamdaStacks extends Stack {
 
     /**
      *
-     * IAM role
+     * IAM role for Queue Lambda function
      */
-    const lambdaRole = new Role(this, "QueueConsumerFunctionRole", {
+    const lambdaQueueRole = new Role(this, "QueueConsumerFunctionRole", {
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           "service-role/AWSLambdaSQSQueueExecutionRole"
         ),
+        ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"),
+        ManagedPolicy.fromAwsManagedPolicyName(
+          "service-role/AWSAppSyncPushToCloudWatchLogs"
+        ),
+      ],
+    });
+
+    /**
+     *
+     * IAM role for Queue Lambda function
+     */
+    const lambdaRole = new Role(this, "LmbdaFunctionRole", {
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+      managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"),
         ManagedPolicy.fromAwsManagedPolicyName(
           "service-role/AWSAppSyncPushToCloudWatchLogs"
@@ -91,7 +109,29 @@ export class BookingLamdaStacks extends Stack {
         role: lambdaRole,
 
         memorySize: 1024,
-        onFailure: new SqsDestination(deadLetterQueue),
+      }
+    );
+
+    /**
+     * Process SQS Messages Lambda
+     */
+    const processSQSLambda: NodejsFunction = new NodejsFunction(
+      this,
+      "ProcessSqSBookingHandler",
+      {
+        tracing: Tracing.ACTIVE,
+        codeSigningConfig,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        handler: "handler",
+        entry: path.join(
+          __dirname,
+          "lambda-fns/booking",
+          "processSqsBooking.ts"
+        ),
+        initialPolicy: [policyStatement],
+        role: lambdaQueueRole,
+
+        memorySize: 1024,
       }
     );
 
@@ -103,9 +143,10 @@ export class BookingLamdaStacks extends Stack {
       this,
       "QueueConsumerFunctionBookingEvent",
       {
-        target: bookingLambda,
+        target: processSQSLambda,
         batchSize: 10,
         eventSourceArn: queue.queueArn,
+        reportBatchItemFailures: true,
       }
     );
     const appsyncLambdaRole = new Role(this, "LambdaRole", {
@@ -140,17 +181,6 @@ export class BookingLamdaStacks extends Stack {
         apiId: acmsGraphqlApi.attrApiId,
         typeName: "Mutation",
         fieldName: "createApartmentBooking",
-        dataSourceName: lambdaDataSources.attrName,
-      }
-    );
-
-    const getBookingPerApartmentResolver: CfnResolver = new CfnResolver(
-      this,
-      "getBookingPerApartmentResolver",
-      {
-        apiId: acmsGraphqlApi.attrApiId,
-        typeName: "Query",
-        fieldName: "getBookings",
         dataSourceName: lambdaDataSources.attrName,
       }
     );
@@ -212,10 +242,9 @@ export class BookingLamdaStacks extends Stack {
 
     createApartmentBookingResolver.addDependsOn(apiSchema);
     getResultBookingPerApartmentResolver.addDependsOn(apiSchema);
-    getBookingPerApartmentResolver.addDependsOn(apiSchema);
-    acmsDatabase.grantFullAccess(bookingLambda);
+    acmsDatabase.grantFullAccess(processSQSLambda);
     queue.grantSendMessages(bookingLambda);
-
+    queue.grantConsumeMessages(processSQSLambda);
     bookingLambda.addEnvironment("ACMS_DB", acmsDatabase.tableName);
     bookingLambda.addEnvironment("BOOKING_QUEUE_URL", queue.queueUrl);
 

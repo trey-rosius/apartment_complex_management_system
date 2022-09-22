@@ -20,7 +20,6 @@ type Mutation {
 
 type Query {
   getUserAccount(id: ID!): User! @aws_cognito_user_pools
-  getBookings(bookingId: String): Booking
 
   getAllUserAccounts(pagination: Pagination): UsersResult!
     @aws_cognito_user_pools(cognito_groups: ["Admins", "Caretakers"])
