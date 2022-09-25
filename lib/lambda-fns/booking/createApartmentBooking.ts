@@ -33,7 +33,7 @@ async function createApartmentBooking(
   logger.info(`create booking input info", ${JSON.stringify(bookingInput)}`);
   const params = {
     TableName: tableName,
-    IndexName: "bookingsPerApartment",
+    IndexName: "getAllApartmentsPerUser",
     KeyConditionExpression: "#GSI1PK = :GSI1PK AND #GSI1SK = :GSI1SK",
     FilterExpression: "#bookingStatus = :bookingStatus",
     ExpressionAttributeNames: {

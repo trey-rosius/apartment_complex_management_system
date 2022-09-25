@@ -144,7 +144,7 @@ export class AcmsStack extends Stack {
     });
 
     this.acmsDatabase.addGlobalSecondaryIndex({
-      indexName: "bookingsPerApartment",
+      indexName: "getAllApartmentsPerUser",
       partitionKey: {
         name: "GSI1PK",
         type: AttributeType.STRING,

@@ -1,7 +1,5 @@
 import { Logger } from "@aws-lambda-powertools/logger";
-import { AWSError, DynamoDB } from "aws-sdk";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { stringify } from "querystring";
+import { DynamoDB } from "aws-sdk";
 
 /**
  * When a caretaker confirms a booking from a to be tenant, a series of changes are being made
@@ -42,8 +40,8 @@ async function confirmBooking(
         {
           Put: {
             Item: {
-              PK: `USER#${userId}`,
-              SK: `APARTMENT#${apartmentId}`,
+              PK: `APARTMENT#${apartmentId}`,
+              SK: `BOOKING#${bookingId}`,
               bookingStatus: "BOOKED",
             },
             TableName: tableName,
