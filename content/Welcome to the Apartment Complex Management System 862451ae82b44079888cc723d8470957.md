@@ -2,30 +2,6 @@
 
 
 
-### Apartments Stack.
-
-The apartment stack follows the same concept  and code structure as the user and building stacks. 
-
-So we’ll dive straight to testing.
-
-You can grab the complete code here.
-
-[https://github.com/trey-rosius/apartment_complex_management_system/blob/master/lib/apartment-lambda-stack.ts](https://github.com/trey-rosius/apartment_complex_management_system/blob/master/lib/apartment-lambda-stack.ts)
-
-### Testing Apartment Stack
-
-```graphql
-createApartment(input: ApartmentInput): Apartment!
-    @aws_cognito_user_pools(cognito_groups: ["Admins"])
-```
-
-This endpoint is only accessible to users belonging the the group `Admins` .
-
-Since we already have a user belonging to this group, we’ll just go ahead and run the endpoint.
-
-![Screen Shot 2022-09-15 at 14.40.19.png](Welcome%20to%20the%20Apartment%20Complex%20Management%20System%20862451ae82b44079888cc723d8470957/Screen_Shot_2022-09-15_at_14.40.19.png)
-
-You can also run the endpoint multiple times with different inputs, to create multiple apartments for that building.
 
 ### Bookings stack
 

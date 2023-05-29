@@ -13,7 +13,10 @@ Content
        |-2.3.graphql_api_and_schema.md
        |-2.4.user_stack.md
        |-2.5.user_lambda_resources.md
-       |-2.6.test_create_user_account_endpoint.md
+       |-2.6.testing_the_create_user_account_endpoint.md
+       |-2.7.building_stack.md
+       |-2.8.testing_the_create_building_endpoint.md
+       |-2.9.apartment_stack
        
         
 
