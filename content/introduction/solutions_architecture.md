@@ -1,6 +1,6 @@
 ## Solutions Architecture
 
-![apartment.jpeg](../assets/apartment.jpeg)
+![alt text](https://github.com/trey-rosius/apartment_complex_management_system/raw/master/assets/apartment.jpeg)
 
 ## ERD(Entity Relationship Diagram)
 
@@ -25,4 +25,4 @@ Users and Bookings share a one to many relationship(One user can create multiple
 
 Users and Payments share a one to many relationship
 
-![https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/entity_relationship_apartment.jpeg](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/entity_relationship_apartment.jpeg)
+![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/entity_relationship_apartment.jpeg)
