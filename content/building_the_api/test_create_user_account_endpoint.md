@@ -6,7 +6,7 @@ createUserAccount(input: UserInput!): User! @aws_cognito_user_pools
 
 We’ll be doing tests from the Appsync console. Sign into your AWS console and navigate to you AppSync. Click on your project name form the Appsync console, once the project is open, navigate to Queries on the left hand-side menu of the screen.
 
-![Screen Shot 2022-09-15 at 11.18.03.png](Welcome%20to%20the%20Apartment%20Complex%20Management%20System%20862451ae82b44079888cc723d8470957/Screen_Shot_2022-09-15_at_11.18.03.png)
+![alt text](https://raw.githubusercontent.com/trey-rosius/apartment_complex_management_system/master/assets/test_create_account_5.png)
 
 Let’s create a user account, using the `createUserAccount` mutation and an `apikey`. 
 
