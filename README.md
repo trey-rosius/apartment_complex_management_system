@@ -12,7 +12,8 @@ Content
        |-2.2.acms_stack.md
        |-2.3.graphql_api_and_schema.md
        |-2.4.user_stack.md
-       |-2.5.lambda_resolver.md
+       |-2.5.user_lambda_resources.md
+       |-2.6.test_create_user_account_endpoint.md
        
         
 

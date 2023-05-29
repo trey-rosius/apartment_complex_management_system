@@ -1,9 +1,13 @@
 ## Lambda Resolver
 
-Inside the `lib` folder, create another folder called `lambda-fns`. This folder would contain code for all our lambda functions and entities.
+Inside the `lib` folder, create another folder called `lambda-fns`. 
+
+This folder would contain code for all our lambda functions and entities.
 Let’s create files and folders specific to the user endpoints and entities.
 
-Inside the `lambda-fns` folder, create another folder called `user`.Create 3 typescript files inside the `user` folder.
+Inside the `lambda-fns` folder, create another folder called `user`.
+
+Create 3 typescript files inside the `user` folder.
 
 - main.ts
 - userEntity.ts
