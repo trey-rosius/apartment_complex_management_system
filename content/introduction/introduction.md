@@ -3,7 +3,7 @@
 
 ## Concept
 
-In this course, we are going to be using Serverless technology to build a system where Building owners can:
+In this course, we'll use Serverless to build a system where Building owners can:
 
 - Create personal accounts.
 - Register the buildings(name, address, number of apartments etc) they own.
@@ -16,7 +16,7 @@ We'll build and deploy a serverless GraphQL API with Appsync,Cdk and Typescript.
 
 ## Prerequisites
 
-Please make sure you have these dependencies installed before proceeding.
+Install these dependencies before proceeding.
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
 - [AWS ACCOUNT AND USER](https://cdkworkshop.com/15-prerequisites/200-account.html)

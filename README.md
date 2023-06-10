@@ -17,6 +17,10 @@ Content
        |-2.7.building_stack.md
        |-2.8.testing_the_create_building_endpoint.md
        |-2.9.apartment_stack
+       |-3.0.bookings_stack
+       |-3.1.process_sqs_booking.md
+    |- 4.Testing
+       |-4.1.testing_create_apartment_booking_endpoint.md
        
         
 
